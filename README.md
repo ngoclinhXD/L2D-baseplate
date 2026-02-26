@@ -40,3 +40,9 @@ npx serve
 ```bash
 python3 -m http.server 8000
 ```
+
+---
+
+# Powered by Live2D
+
+https://www.live2d.com/

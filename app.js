@@ -13,7 +13,7 @@ async function initLive2D() {
     app.stage.addChild(model);
 
     const yOffset = 800; 
-    const xOffset = 350;
+    const xOffset = 200;
     let isTrackingMouse = true;
     let isPlayingMotion = false;
     let hasPlayedMotion = false;
