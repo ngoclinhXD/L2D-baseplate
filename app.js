@@ -12,37 +12,141 @@ async function initLive2D() {
     let model = await PIXI.live2d.Live2DModel.from(modelUrl);
     app.stage.addChild(model);
 
-    const yOffset = 800; 
-    const xOffset = 350;
+    let offsetX = 350;
+    let offsetY = 800;
+    let baseScale = 0.3;
+    let eyeLevelOffset = 0.25;
+
+    const savedTransformStr = localStorage.getItem('modelTransform');
+    if (savedTransformStr) {
+        try {
+            const savedT = JSON.parse(savedTransformStr);
+            if (savedT.offsetX !== undefined) offsetX = savedT.offsetX;
+            if (savedT.offsetY !== undefined) offsetY = savedT.offsetY;
+            if (savedT.scale !== undefined) baseScale = savedT.scale;
+        } catch(e) {}
+    }
+
+    const savedEyeLevel = localStorage.getItem('eyeLevelOffset');
+    if (savedEyeLevel) {
+        eyeLevelOffset = parseFloat(savedEyeLevel);
+    }
+
+    let tempOffsetX = offsetX;
+    let tempOffsetY = offsetY;
+    let tempScale = baseScale;
+
     let isTrackingMouse = true;
     let isPlayingMotion = false;
     let hasPlayedMotion = false;
+    let isAdjustMode = false;
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let isCalibratingUI = false;
+    let isDraggingLine = false;
+
+    function applyTransform(scale, offX, offY) {
+        model.scale.set(scale);
+        model.x = (app.renderer.width / 2) + offX;
+        model.y = (app.renderer.height / 2) + offY;
+    }
 
     function setupModel(m) {
-        m.scale.set(0.3); 
         m.anchor.set(0.5, 0.5);
-        m.x = (app.renderer.width / 2) + xOffset;
-        m.y = (app.renderer.height / 2) + yOffset;
+        applyTransform(baseScale, offsetX, offsetY);
     }
 
     setupModel(model);
 
     window.addEventListener('resize', () => {
-        model.x = (app.renderer.width / 2) + xOffset;
-        model.y = (app.renderer.height / 2) + yOffset;
-    });
-
-    window.addEventListener('mousemove', (event) => {
-        if (isTrackingMouse && !isPlayingMotion) {
-            const rect = app.view.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-            model.focus(x + xOffset, y + yOffset);
+        if (isAdjustMode) {
+            applyTransform(tempScale, tempOffsetX, tempOffsetY);
+        } else {
+            applyTransform(baseScale, offsetX, offsetY);
         }
     });
 
+    app.view.addEventListener('mousedown', (e) => {
+        if (!isAdjustMode) return;
+        isDragging = true;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+    });
+
+    const calibHandle = document.querySelector('.calib-handle');
+    const calibrationLine = document.getElementById('calibration-line');
+    
+    if (calibHandle) {
+        calibHandle.addEventListener('mousedown', (e) => {
+            if (!isCalibratingUI) return;
+            isDraggingLine = true;
+            e.stopPropagation();
+        });
+    }
+
+    window.addEventListener('mouseup', () => {
+        if (isAdjustMode) isDragging = false;
+        if (isCalibratingUI) isDraggingLine = false;
+    });
+
+    window.addEventListener('mousemove', (event) => {
+        if (isAdjustMode && isDragging) {
+            const dx = event.clientX - dragStartX;
+            const dy = event.clientY - dragStartY;
+            tempOffsetX += dx;
+            tempOffsetY += dy;
+            dragStartX = event.clientX;
+            dragStartY = event.clientY;
+            applyTransform(tempScale, tempOffsetX, tempOffsetY);
+        } else {
+            if (isCalibratingUI && isDraggingLine) {
+                let newLineY = event.clientY;
+                calibrationLine.style.top = `${newLineY}px`;
+                eyeLevelOffset = (model.y - newLineY) / model.height;
+            }
+
+            if (isTrackingMouse && !isPlayingMotion && !isAdjustMode) {
+                const rect = app.view.getBoundingClientRect();
+                const mouseX = event.clientX - rect.left;
+                const mouseY = event.clientY - rect.top;
+                
+                const headX = model.x;
+                const headY = model.y - (model.height * eyeLevelOffset);
+                
+                const dx = mouseX - headX;
+                const dy = mouseY - headY;
+                
+                let nx = dx / (window.innerWidth / 2);
+                let ny = -(dy / (window.innerHeight / 2));
+                
+                nx = Math.max(-1, Math.min(1, nx));
+                ny = Math.max(-1, Math.min(1, ny));
+                
+                if (model.internalModel && model.internalModel.focusController) {
+                    model.internalModel.focusController.focus(nx, ny);
+                }
+            }
+        }
+    });
+
+    app.view.addEventListener('wheel', (event) => {
+        if (!isAdjustMode) return;
+        event.preventDefault();
+        const zoomAmount = 0.015;
+        if (event.deltaY < 0) {
+            tempScale += zoomAmount;
+        } else {
+            tempScale -= zoomAmount;
+        }
+        tempScale = Math.max(0.05, Math.min(tempScale, 2.0));
+        applyTransform(tempScale, tempOffsetX, tempOffsetY);
+    }, { passive: false });
+
     function resetFocus() {
-        model.internalModel.focusController.focus(0, 0);
+        if (model.internalModel && model.internalModel.focusController) {
+            model.internalModel.focusController.focus(0, 0);
+        }
     }
 
     async function forceResetModel() {
@@ -111,6 +215,90 @@ async function initLive2D() {
     const resetBtn = document.getElementById('reset-btn');
     if (resetBtn) {
         resetBtn.addEventListener('click', forceResetModel);
+    }
+
+    const adjustBtn = document.getElementById('adjust-btn');
+    const adjustUI = document.getElementById('adjust-ui');
+    const adjSave = document.getElementById('adj-save');
+    const adjCancel = document.getElementById('adj-cancel');
+    const adjReset = document.getElementById('adj-reset');
+    const extraBtn = document.getElementById('extra-btn');
+    const sidebar = document.getElementById('sidebar');
+
+    const calibrateBtn = document.getElementById('calibrate-btn');
+    const calibrationUI = document.getElementById('calibration-ui');
+    const calibDoneBtn = document.getElementById('calib-done');
+
+    if (calibrateBtn) {
+        calibrateBtn.addEventListener('click', () => {
+            isCalibratingUI = true;
+            sidebar.classList.remove('visible');
+            extraBtn.classList.add('hidden');
+            calibrationUI.classList.remove('hidden-top');
+            calibrationLine.classList.remove('hidden-fade');
+
+            const startLineY = model.y - (model.height * eyeLevelOffset);
+            calibrationLine.style.top = `${startLineY}px`;
+        });
+    }
+
+    if (calibDoneBtn) {
+        calibDoneBtn.addEventListener('click', () => {
+            isCalibratingUI = false;
+            localStorage.setItem('eyeLevelOffset', eyeLevelOffset);
+            calibrationUI.classList.add('hidden-top');
+            calibrationLine.classList.add('hidden-fade');
+            sidebar.classList.add('visible');
+        });
+    }
+
+    if (adjustBtn) {
+        adjustBtn.addEventListener('click', () => {
+            isAdjustMode = true;
+            tempOffsetX = offsetX;
+            tempOffsetY = offsetY;
+            tempScale = baseScale;
+            
+            sidebar.classList.remove('visible');
+            extraBtn.classList.add('hidden');
+            adjustUI.classList.remove('hidden');
+        });
+    }
+
+    if (adjSave) {
+        adjSave.addEventListener('click', () => {
+            isAdjustMode = false;
+            offsetX = tempOffsetX;
+            offsetY = tempOffsetY;
+            baseScale = tempScale;
+            localStorage.setItem('modelTransform', JSON.stringify({
+                offsetX: offsetX,
+                offsetY: offsetY,
+                scale: baseScale
+            }));
+            
+            adjustUI.classList.add('hidden');
+            sidebar.classList.add('visible');
+        });
+    }
+
+    if (adjCancel) {
+        adjCancel.addEventListener('click', () => {
+            isAdjustMode = false;
+            applyTransform(baseScale, offsetX, offsetY);
+            
+            adjustUI.classList.add('hidden');
+            sidebar.classList.add('visible');
+        });
+    }
+
+    if (adjReset) {
+        adjReset.addEventListener('click', () => {
+            tempOffsetX = 350;
+            tempOffsetY = 800;
+            tempScale = 0.3;
+            applyTransform(tempScale, tempOffsetX, tempOffsetY);
+        });
     }
 
     const expList = document.getElementById('exp-list');
