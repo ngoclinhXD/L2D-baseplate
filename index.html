@@ -67,9 +67,11 @@
                 model.focus(x + xOffset, y + yOffset);
             });
 
-            document.addEventListener('mouseleave', () => {
-                model.focus((app.renderer.width / 2) + xOffset, (app.renderer.height / 2) + yOffset);
-            });
+            function resetFocus() {
+                model.internalModel.focusController.focus(0, 0);
+            }
+            document.documentElement.addEventListener('mouseleave', resetFocus);
+            window.addEventListener('blur', resetFocus);
         }
 
         initLive2D();
