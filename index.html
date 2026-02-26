@@ -14,10 +14,8 @@
     <button id="extra-btn">Menu</button>
 
     <div id="sidebar">
-        <h2>Menu</h2>
-        <button id="close-btn">Close</button>
-
-        <button id="reset-btn" class="action-btn reset-style">Reset to Normal</button>
+        <button id="close-btn">✕</button>
+        <h2>Control Panel</h2>
         
         <details class="dropdown">
             <summary>Expressions</summary>
@@ -37,6 +35,7 @@
                     <span class="slider"></span>
                 </label>
             </div>
+            
             <div class="toggle-row">
                 <span>Dark Mode</span>
                 <label class="switch">
@@ -44,6 +43,18 @@
                     <span class="slider"></span>
                 </label>
             </div>
+
+            <div class="toggle-row" style="margin-top: 15px; display: block;">
+                <span style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 15px; color: inherit;">Custom Background</span>
+                <input type="file" id="bg-upload" accept="image/*" style="display: none;">
+                <button id="custom-bg-btn" class="action-btn" style="width: 100%; text-align: center;">Choose Image...</button>
+                <div id="bg-file-info" class="bg-info-box">
+                    <span id="bg-file-name" class="bg-file-name"></span>
+                    <button id="bg-remove-btn" class="bg-remove-btn">×</button>
+                </div>
+            </div>
+
+            <button id="reset-btn" class="action-btn reset-style">Force Reset Model</button>
         </div>
     </div>
 

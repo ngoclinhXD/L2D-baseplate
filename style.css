@@ -46,17 +46,18 @@ body, html {
 
 #sidebar {
     position: absolute;
-    top: 0;
-    left: -320px;
+    top: 20px;
+    left: -350px;
     width: 300px;
-    height: 100vh;
+    height: calc(100vh - 40px);
     background: rgba(255, 255, 255, 0.65);
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
-    border-right: 1px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 24px;
+    box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.05);
     transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s ease;
-    padding: 40px 24px;
+    padding: 24px;
     box-sizing: border-box;
     z-index: 20;
     overflow-y: auto;
@@ -71,7 +72,7 @@ body, html {
 }
 
 #sidebar.visible {
-    left: 0;
+    left: 20px;
 }
 
 #sidebar h2 {
@@ -80,26 +81,37 @@ body, html {
     font-weight: 700;
     color: #1d1d1f;
     letter-spacing: -0.5px;
+    line-height: 32px;
 }
 
 #sidebar p {
     color: #86868b;
     font-size: 15px;
     line-height: 1.5;
+    margin-top: 0;
+    margin-bottom: 20px;
 }
 
 #close-btn {
-    margin-top: 10px;
-    margin-bottom: 20px;
-    padding: 10px 20px;
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    width: 32px;
+    height: 32px;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
     border: none;
-    border-radius: 12px;
+    border-radius: 50%;
     background-color: #f5f5f7;
     color: #1d1d1f;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 600;
     transition: all 0.2s ease;
+    z-index: 10;
 }
 
 #close-btn:hover {
@@ -260,13 +272,51 @@ input:checked + .slider:before {
     transform: translateX(20px);
 }
 
+.bg-info-box {
+    display: none;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.04);
+    padding: 8px 12px;
+    border-radius: 10px;
+    margin-top: 8px;
+}
+
+.bg-file-name {
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 85%;
+    color: #1d1d1f;
+    font-weight: 500;
+}
+
+.bg-remove-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #ff453a;
+    font-weight: 700;
+    font-size: 18px;
+    padding: 0 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+}
+
+.bg-remove-btn:hover {
+    transform: scale(1.2);
+}
+
 body.dark-mode {
     background-color: #1a1a1a;
 }
 
 body.dark-mode #sidebar {
     background: rgba(30, 30, 30, 0.75);
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 body.dark-mode #sidebar h2, 
@@ -313,4 +363,22 @@ body.dark-mode #extra-btn {
 
 body.dark-mode #extra-btn:hover {
     background: rgba(30, 30, 30, 0.8);
+}
+
+body.dark-mode .reset-style {
+    background: rgba(220, 20, 60, 0.15);
+    color: #ff4d4d;
+    border: 1px solid rgba(220, 20, 60, 0.3);
+}
+
+body.dark-mode .reset-style:hover {
+    background: rgba(220, 20, 60, 0.3);
+}
+
+body.dark-mode .bg-info-box {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .bg-file-name {
+    color: #f5f5f7;
 }

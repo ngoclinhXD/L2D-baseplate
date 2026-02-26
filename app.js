@@ -13,7 +13,7 @@ async function initLive2D() {
     app.stage.addChild(model);
 
     const yOffset = 800; 
-    const xOffset = 200;
+    const xOffset = 350;
     let isTrackingMouse = true;
     let isPlayingMotion = false;
     let hasPlayedMotion = false;
@@ -93,10 +93,17 @@ async function initLive2D() {
     document.documentElement.addEventListener('mouseleave', resetFocus);
     window.addEventListener('blur', resetFocus);
 
+    const savedTracking = localStorage.getItem('mouseTracking');
     const trackingToggle = document.getElementById('mouse-tracking-toggle');
+    if (savedTracking !== null) {
+        isTrackingMouse = savedTracking === 'true';
+        if (trackingToggle) trackingToggle.checked = isTrackingMouse;
+    }
+
     if (trackingToggle) {
         trackingToggle.addEventListener('change', (event) => {
             isTrackingMouse = event.target.checked;
+            localStorage.setItem('mouseTracking', isTrackingMouse);
             if (!isTrackingMouse) resetFocus();
         });
     }
@@ -151,6 +158,24 @@ const sidebar = document.getElementById('sidebar');
 const closeBtn = document.getElementById('close-btn');
 const darkModeToggle = document.getElementById('dark-mode-toggle');
 
+const bgUpload = document.getElementById('bg-upload');
+const customBgBtn = document.getElementById('custom-bg-btn');
+const bgFileInfo = document.getElementById('bg-file-info');
+const bgFileName = document.getElementById('bg-file-name');
+const bgRemoveBtn = document.getElementById('bg-remove-btn');
+
+function updateBgUI(fileName) {
+    if (fileName) {
+        customBgBtn.style.display = 'none';
+        bgFileInfo.style.display = 'flex';
+        bgFileName.textContent = fileName;
+    } else {
+        customBgBtn.style.display = 'block';
+        bgFileInfo.style.display = 'none';
+        bgFileName.textContent = '';
+    }
+}
+
 extraBtn.addEventListener('click', () => {
     extraBtn.classList.add('hidden');
     sidebar.classList.add('visible');
@@ -161,12 +186,71 @@ closeBtn.addEventListener('click', () => {
     extraBtn.classList.remove('hidden');
 });
 
+const savedDarkMode = localStorage.getItem('darkMode');
+if (savedDarkMode === 'true') {
+    document.body.classList.add('dark-mode');
+    if (darkModeToggle) darkModeToggle.checked = true;
+}
+
 if (darkModeToggle) {
     darkModeToggle.addEventListener('change', (event) => {
-        if (event.target.checked) {
+        const isDark = event.target.checked;
+        if (isDark) {
             document.body.classList.add('dark-mode');
         } else {
             document.body.classList.remove('dark-mode');
         }
+        localStorage.setItem('darkMode', isDark);
+    });
+}
+
+const savedBg = localStorage.getItem('customBg');
+const savedBgName = localStorage.getItem('customBgName') || 'Saved Background';
+if (savedBg) {
+    document.body.style.backgroundImage = `url(${savedBg})`;
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.backgroundPosition = 'center';
+    document.body.style.backgroundRepeat = 'no-repeat';
+    updateBgUI(savedBgName);
+}
+
+if (customBgBtn && bgUpload) {
+    customBgBtn.addEventListener('click', () => {
+        bgUpload.click();
+    });
+}
+
+if (bgUpload) {
+    bgUpload.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const base64Img = e.target.result;
+                document.body.style.backgroundImage = `url(${base64Img})`;
+                document.body.style.backgroundSize = 'cover';
+                document.body.style.backgroundPosition = 'center';
+                document.body.style.backgroundRepeat = 'no-repeat';
+                try {
+                    localStorage.setItem('customBg', base64Img);
+                    localStorage.setItem('customBgName', file.name);
+                    updateBgUI(file.name);
+                } catch (err) {
+                    console.warn('Image is too massive for local storage bro!');
+                    updateBgUI(file.name);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+}
+
+if (bgRemoveBtn) {
+    bgRemoveBtn.addEventListener('click', () => {
+        document.body.style.backgroundImage = 'none';
+        localStorage.removeItem('customBg');
+        localStorage.removeItem('customBgName');
+        bgUpload.value = '';
+        updateBgUI('');
     });
 }
