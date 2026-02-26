@@ -2,6 +2,9 @@
 
 A lightweight, client-side Live2D model viewer built with PixiJS and the `pixi-live2d-display` wrapper. It uses WebGL to render models directly on the local device with full mouse-tracking.
 
+**The default model is Huohuo**
+https://booth.pm/en/items/5288339
+
 ## Prerequisites
 
 - A local web server environment (Python or Node.js)
