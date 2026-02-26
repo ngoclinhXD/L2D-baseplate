@@ -5,6 +5,8 @@ A lightweight, client-side Live2D model viewer built with PixiJS and the `pixi-l
 **The default model is Huohuo**
 https://booth.pm/en/items/5288339
 
+## Read updates.md for latest changes.
+
 ## Prerequisites
 
 - A local web server environment (Python or Node.js)
