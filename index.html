@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>test</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: transparent;
+        }
+        #live2d-canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+    <script src="./live2dcubismcore.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.x/dist/pixi.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pixi-live2d-display/dist/cubism4.min.js"></script>
+</head>
+<body>
+    <canvas id="live2d-canvas"></canvas>
+
+    <script>
+        window.PIXI = PIXI;
+
+        async function initLive2D() {
+            const app = new PIXI.Application({
+                view: document.getElementById('live2d-canvas'),
+                autoStart: true,
+                backgroundAlpha: 0,
+                resizeTo: window
+            });
+
+            const modelUrl = './model/huohuo.model3.json';
+            const model = await PIXI.live2d.Live2DModel.from(modelUrl);
+
+            app.stage.addChild(model);
+
+            model.scale.set(0.3); 
+            model.anchor.set(0.5, 0.5);
+            
+            // offset
+            const yOffset = 800; 
+            const xOffset = 0;
+
+            function centerModel() {
+                model.x = (app.renderer.width / 2) + xOffset;
+                model.y = (app.renderer.height / 2) + yOffset;
+            }
+            
+            centerModel();
+
+            window.addEventListener('resize', () => {
+                centerModel();
+            });
+
+            window.addEventListener('mousemove', (event) => {
+                const rect = app.view.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top;
+                
+                model.focus(x + xOffset, y + yOffset);
+            });
+
+            document.addEventListener('mouseleave', () => {
+                model.focus((app.renderer.width / 2) + xOffset, (app.renderer.height / 2) + yOffset);
+            });
+        }
+
+        initLive2D();
+    </script>
+</body>
+</html>
