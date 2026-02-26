@@ -1,0 +1,316 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: transparent;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    transition: background-color 0.4s ease;
+}
+
+#live2d-canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+}
+
+#extra-btn {
+    position: absolute;
+    bottom: 30px;
+    left: 30px;
+    padding: 12px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    color: #333;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+#extra-btn:hover {
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(1.05);
+}
+
+#extra-btn.hidden {
+    transform: translateX(-200%);
+    opacity: 0;
+}
+
+#sidebar {
+    position: absolute;
+    top: 0;
+    left: -320px;
+    width: 300px;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border-right: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.05);
+    transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s ease;
+    padding: 40px 24px;
+    box-sizing: border-box;
+    z-index: 20;
+    overflow-y: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    display: flex;
+    flex-direction: column;
+}
+
+#sidebar::-webkit-scrollbar {
+    display: none;
+}
+
+#sidebar.visible {
+    left: 0;
+}
+
+#sidebar h2 {
+    margin-top: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #1d1d1f;
+    letter-spacing: -0.5px;
+}
+
+#sidebar p {
+    color: #86868b;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+#close-btn {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    cursor: pointer;
+    border: none;
+    border-radius: 12px;
+    background-color: #f5f5f7;
+    color: #1d1d1f;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+#close-btn:hover {
+    background-color: #e8e8ed;
+}
+
+.dropdown {
+    margin-top: 15px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 16px;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+summary {
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    color: #1d1d1f;
+    outline: none;
+    user-select: none;
+    list-style: none;
+    position: relative;
+}
+
+summary::-webkit-details-marker {
+    display: none;
+}
+
+summary::after {
+    content: "›";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 22px;
+    color: #86868b;
+    transition: transform 0.3s ease;
+}
+
+details[open] summary::after {
+    transform: translateY(-50%) rotate(90deg);
+}
+
+details[open] .button-list {
+    animation: slideDownFade 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideDownFade {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.button-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.action-btn {
+    padding: 10px 14px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.04);
+    color: #1d1d1f;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+    text-align: left;
+    font-weight: 500;
+}
+
+.action-btn:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.reset-style {
+    width: 100%;
+    margin-top: 10px;
+    background: rgba(255, 69, 58, 0.1);
+    color: #ff453a;
+    border: 1px solid rgba(255, 69, 58, 0.2);
+    font-weight: 600;
+    text-align: center;
+}
+
+.reset-style:hover {
+    background: rgba(255, 69, 58, 0.2);
+}
+
+.settings-group {
+    margin-top: 30px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.toggle-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    font-weight: 600;
+    font-size: 15px;
+    color: #1d1d1f;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #e5e5ea;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input:checked + .slider {
+    background-color: #34c759;
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+body.dark-mode {
+    background-color: #1a1a1a;
+}
+
+body.dark-mode #sidebar {
+    background: rgba(30, 30, 30, 0.75);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode #sidebar h2, 
+body.dark-mode .toggle-row, 
+body.dark-mode summary {
+    color: #f5f5f7;
+}
+
+body.dark-mode #sidebar p {
+    color: #a1a1a6;
+}
+
+body.dark-mode .settings-group {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .action-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: #f5f5f7;
+}
+
+body.dark-mode .action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-mode .dropdown {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode #close-btn {
+    background-color: #333;
+    color: white;
+}
+
+body.dark-mode #close-btn:hover {
+    background-color: #444;
+}
+
+body.dark-mode #extra-btn {
+    background: rgba(30, 30, 30, 0.5);
+    color: #f5f5f7;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode #extra-btn:hover {
+    background: rgba(30, 30, 30, 0.8);
+}

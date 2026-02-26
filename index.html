@@ -3,21 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>test</title>
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: transparent;
-        }
-        #live2d-canvas {
-            display: block;
-            width: 100vw;
-            height: 100vh;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
     <script src="./live2dcubismcore.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.x/dist/pixi.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pixi-live2d-display/dist/cubism4.min.js"></script>
@@ -25,56 +11,42 @@
 <body>
     <canvas id="live2d-canvas"></canvas>
 
-    <script>
-        window.PIXI = PIXI;
+    <button id="extra-btn">Menu</button>
 
-        async function initLive2D() {
-            const app = new PIXI.Application({
-                view: document.getElementById('live2d-canvas'),
-                autoStart: true,
-                backgroundAlpha: 0,
-                resizeTo: window
-            });
+    <div id="sidebar">
+        <h2>Menu</h2>
+        <button id="close-btn">Close</button>
 
-            const modelUrl = './model/huohuo.model3.json';
-            const model = await PIXI.live2d.Live2DModel.from(modelUrl);
+        <button id="reset-btn" class="action-btn reset-style">Reset to Normal</button>
+        
+        <details class="dropdown">
+            <summary>Expressions</summary>
+            <div id="exp-list" class="button-list"></div>
+        </details>
 
-            app.stage.addChild(model);
+        <details class="dropdown">
+            <summary>Motions</summary>
+            <div id="mot-list" class="button-list"></div>
+        </details>
 
-            model.scale.set(0.3); 
-            model.anchor.set(0.5, 0.5);
-            
-            // offset
-            const yOffset = 800; 
-            const xOffset = 0;
+        <div class="settings-group">
+            <div class="toggle-row">
+                <span>Mouse Tracking</span>
+                <label class="switch">
+                    <input type="checkbox" id="mouse-tracking-toggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="toggle-row">
+                <span>Dark Mode</span>
+                <label class="switch">
+                    <input type="checkbox" id="dark-mode-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
 
-            function centerModel() {
-                model.x = (app.renderer.width / 2) + xOffset;
-                model.y = (app.renderer.height / 2) + yOffset;
-            }
-            
-            centerModel();
-
-            window.addEventListener('resize', () => {
-                centerModel();
-            });
-
-            window.addEventListener('mousemove', (event) => {
-                const rect = app.view.getBoundingClientRect();
-                const x = event.clientX - rect.left;
-                const y = event.clientY - rect.top;
-                
-                model.focus(x + xOffset, y + yOffset);
-            });
-
-            function resetFocus() {
-                model.internalModel.focusController.focus(0, 0);
-            }
-            document.documentElement.addEventListener('mouseleave', resetFocus);
-            window.addEventListener('blur', resetFocus);
-        }
-
-        initLive2D();
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>
