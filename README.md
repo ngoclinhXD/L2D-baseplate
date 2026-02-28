@@ -22,10 +22,13 @@ more coming soon!
 To avoid missing file errors, ensure your directory is organized like this:
 
 - `index.html`
+- `app.js`
+- `style.css`
 - `live2dcubismcore.min.js`
 - `model/` (Place your compiled Live2D model folder here!)
 
 The `model` folder must contain your `.model3.json` file, `.moc3` file, and the texture images.
+
 **REMEMBER TO REPLACE THE MODEL FILE NAME IN `app.js` WITH YOUR OWN**
 
 ## How to Run
