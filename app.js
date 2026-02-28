@@ -13,19 +13,34 @@ async function initLive2D() {
     });
 
     let modelUrl = './model/huohuo.model3.json';
-    
-    function updateProgress(ratio) {
-        const percent = Math.round(ratio * 100);
-        progressBar.style.width = percent + '%';
-        loadingText.innerText = `Loading: ${percent}%`;
+
+    async function runFakeLoading() {
+        const steps = [
+            Math.floor(Math.random() * 15) + 15,
+            Math.floor(Math.random() * 20) + 40,
+            Math.floor(Math.random() * 15) + 70,
+            Math.floor(Math.random() * 10) + 85
+        ];
+        
+        for (let p of steps) {
+            progressBar.style.width = p + '%';
+            loadingText.innerText = `Loading: ${p}%`;
+            await new Promise(r => setTimeout(r, 300 + Math.random() * 200));
+        }
     }
 
-    let model = await PIXI.live2d.Live2DModel.from(modelUrl, {
-        onProgress: updateProgress
-    });
+    let loadPromise = PIXI.live2d.Live2DModel.from(modelUrl);
+    await runFakeLoading();
+    let model = await loadPromise;
+    
+    app.stage.addChild(model);
+
+    progressBar.style.width = '100%';
+    loadingText.innerText = `Loading: 100%`;
+    
+    await new Promise(r => setTimeout(r, 150));
     
     loadingScreen.classList.add('hidden');
-    app.stage.addChild(model);
 
     let offsetX = 350;
     let offsetY = 800;
@@ -323,10 +338,16 @@ async function initLive2D() {
 
     async function forceResetModel() {
         loadingScreen.classList.remove('hidden');
-        updateProgress(0);
+        progressBar.style.width = '0%';
+        loadingText.innerText = 'Loading: 0%';
+        
         if (!hasPlayedMotion) {
             isPlayingMotion = false;
             model.internalModel.motionManager.stopAllMotions();
+            await runFakeLoading();
+            progressBar.style.width = '100%';
+            loadingText.innerText = `Loading: 100%`;
+            await new Promise(r => setTimeout(r, 400));
             loadingScreen.classList.add('hidden');
             return;
         }
@@ -339,7 +360,11 @@ async function initLive2D() {
         }
         app.stage.removeChild(model);
         model.destroy();
-        model = await PIXI.live2d.Live2DModel.from(modelUrl, { onProgress: updateProgress });
+        
+        let resetPromise = PIXI.live2d.Live2DModel.from(modelUrl);
+        await runFakeLoading();
+        model = await resetPromise;
+        
         setupModel(model);
         model.y = targetY;
         app.stage.addChild(model);
@@ -349,6 +374,10 @@ async function initLive2D() {
         }
         hasPlayedMotion = false;
         isPlayingMotion = false;
+        
+        progressBar.style.width = '100%';
+        loadingText.innerText = `Loading: 100%`;
+        await new Promise(r => setTimeout(r, 400));
         loadingScreen.classList.add('hidden');
     }
 
