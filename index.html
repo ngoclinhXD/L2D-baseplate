@@ -9,13 +9,32 @@
     <script src="https://cdn.jsdelivr.net/npm/pixi-live2d-display/dist/cubism4.min.js"></script>
 </head>
 <body>
+    <div id="loading-screen">
+        <div class="loading-content">
+            <div id="progress-container">
+                <div id="progress-bar"></div>
+            </div>
+            <div id="loading-text">Loading: 0%</div>
+        </div>
+    </div>
+
     <canvas id="live2d-canvas"></canvas>
 
     <button id="extra-btn">Menu</button>
 
-    <div id="calibration-ui" class="hidden-top">
-        <p style="margin: 0 0 10px 0; font-weight: 600; color: #1d1d1f; font-size: 15px;">Drag line to model's eye level</p>
-        <button id="calib-done" class="action-btn" style="width: 100%; text-align: center; background: rgba(52, 199, 89, 0.15); color: #34c759; border: 1px solid rgba(52, 199, 89, 0.3); font-weight: 700;">Done</button>
+    <div id="calibration-ui" class="hidden-fade">
+        <div id="head-hitbox">
+            <div id="hitbox-resize-handle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <path d="M7 17L17 7M17 7H10M17 7V14" />
+                    <path d="M17 7L7 17M7 17H14M7 17V10" />
+                </svg>
+            </div>
+        </div>
+        <div id="calib-controls">
+            <p style="margin: 0 0 10px 0; font-weight: 600; color: #1d1d1f; font-size: 15px;">Drag line to Eye Level<br>Drag box to Head</p>
+            <button id="calib-done" class="action-btn" style="width: 100%; text-align: center; background: rgba(52, 199, 89, 0.2); color: #34c759; border: 1px solid rgba(52, 199, 89, 0.4); font-weight: 700;">Done</button>
+        </div>
     </div>
 
     <div id="calibration-line" class="hidden-fade">
@@ -31,7 +50,7 @@
     <div id="sidebar">
         <button id="close-btn">✕</button>
         <h2>Control Panel</h2>
-<details class="dropdown">
+        <details class="dropdown">
             <summary>Expressions</summary>
             <div id="exp-list" class="button-list"></div>
         </details>
@@ -43,16 +62,7 @@
 
         <div class="settings-group">
             <div class="toggle-row">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <button id="calibrate-btn" class="icon-btn">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                        <span class="tooltip-text">Calibration</span>
-                    </button>
-                    <span>Follow Mouse</span>
-                </div>
+                <span>Follow Mouse</span>
                 <label class="switch">
                     <input type="checkbox" id="mouse-tracking-toggle" checked>
                     <span class="slider"></span>
@@ -78,6 +88,7 @@
             </div>
 
             <button id="adjust-btn" class="action-btn" style="width: 100%; margin-top: 15px; text-align: center; background: rgba(0, 122, 255, 0.1); color: #007aff; border: 1px solid rgba(0, 122, 255, 0.2); font-weight: 600;">Adjust Model Position</button>
+            <button id="calibrate-btn" class="action-btn" style="width: 100%; margin-top: 10px; text-align: center; background: rgba(255, 204, 0, 0.15); color: #d4af37; border: 1px solid rgba(255, 204, 0, 0.3); font-weight: 600;">Calibrate Model Focus</button>
             <button id="reset-btn" class="action-btn reset-style">Force Reset Model</button>
         </div>
     </div>
